@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Sidebar, SidebarProvider, MobileHeader } from '@/components/sidebar';
-import { PageLoader } from '@/components/loading';
+import { AppShellLoader, PageLoader } from '@/components/loading';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [user, loading, router]);
 
   if (loading) {
-    return <PageLoader message="Loading your dashboard..." />;
+    return <AppShellLoader />;
   }
 
   if (!user) {

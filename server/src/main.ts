@@ -18,7 +18,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3001);
-  console.log('Server running on http://localhost:3001');
+  await app.listen(3005);
+  console.log('Server running on http://localhost:3005');
 }
 bootstrap();

@@ -204,6 +204,8 @@ export default function DashboardPage() {
                   fontSize: '12px',
                   padding: '8px 12px',
                 }}
+                labelStyle={{ color: '#94a3b8' }}
+                itemStyle={{ color: '#fff' }}
                 formatter={(value: number) => [formatCurrency(value), 'Spent']}
               />
               <Area
@@ -248,6 +250,8 @@ export default function DashboardPage() {
                       fontSize: '12px',
                       padding: '8px 12px',
                     }}
+                    labelStyle={{ color: '#94a3b8' }}
+                    itemStyle={{ color: '#fff' }}
                     formatter={(value: number) => formatCurrency(value)}
                   />
                 </PieChart>
@@ -303,6 +307,8 @@ export default function DashboardPage() {
                   fontSize: '12px',
                   padding: '8px 12px',
                 }}
+                labelStyle={{ color: '#94a3b8' }}
+                itemStyle={{ color: '#fff' }}
                 formatter={(value: number) => [formatCurrency(value), 'Total']}
               />
               <Bar dataKey="total" fill="#0f172a" radius={[6, 6, 0, 0]} />

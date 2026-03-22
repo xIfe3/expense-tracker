@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { expenses as expensesApi, categories as categoriesApi } from '@/lib/api';
-import { formatCurrency, formatDate, getCurrentMonth } from '@/lib/utils';
+import { formatCurrency, formatDate, getCurrentMonth, getMonthLabel } from '@/lib/utils';
 import { useToast } from '@/components/toast';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { TableSkeleton } from '@/components/loading';
-import { Plus, Trash2, Pencil, Search, X } from 'lucide-react';
+import { Plus, Trash2, Pencil, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Category { id: number; name: string; color: string; }
 interface Expense {
@@ -27,6 +27,7 @@ export default function ExpensesPage() {
   const [expensesList, setExpensesList] = useState<Expense[]>([]);
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
   const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [month, setMonth] = useState(getCurrentMonth());
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -37,18 +38,23 @@ export default function ExpensesPage() {
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const changeMonth = (delta: number) => {
+    const [y, m] = month.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    setMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  };
+
   const fetchExpenses = useCallback(async (page = 1) => {
     const params: Record<string, string> = { page: String(page), limit: '15' };
     if (search) params.search = search;
     if (categoryFilter) params.categoryId = categoryFilter;
-    const month = getCurrentMonth();
     params.startDate = `${month}-01`;
     const end = new Date(parseInt(month.split('-')[0]), parseInt(month.split('-')[1]), 0);
     params.endDate = end.toISOString().slice(0, 10);
     const res = await expensesApi.list(params);
     setExpensesList(res.data);
     setMeta(res.meta);
-  }, [search, categoryFilter]);
+  }, [search, categoryFilter, month]);
 
   useEffect(() => {
     Promise.all([fetchExpenses(), categoriesApi.list()]).then(([, cats]) => {
@@ -125,14 +131,27 @@ export default function ExpensesPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">Expenses</h1>
-          <p className="mt-0.5 text-sm text-slate-500">{meta.total} transactions this month</p>
+          <p className="mt-0.5 text-sm text-slate-500">{meta.total} transactions</p>
         </div>
-        <button
-          onClick={openAdd}
-          className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          <Plus className="h-4 w-4" /> Add expense
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-xl border border-slate-200 px-1 py-1">
+            <button onClick={() => changeMonth(-1)} className="rounded-lg p-1.5 hover:bg-slate-100">
+              <ChevronLeft className="h-4 w-4 text-slate-600" />
+            </button>
+            <span className="min-w-[110px] text-center text-sm font-medium text-slate-700">
+              {getMonthLabel(month)}
+            </span>
+            <button onClick={() => changeMonth(1)} className="rounded-lg p-1.5 hover:bg-slate-100">
+              <ChevronRight className="h-4 w-4 text-slate-600" />
+            </button>
+          </div>
+          <button
+            onClick={openAdd}
+            className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            <Plus className="h-4 w-4" /> Add expense
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

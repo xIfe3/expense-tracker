@@ -1,4 +1,4 @@
-const API_URL = "https://expense-tracker-5woc.onrender.com";
+const API_URL = "https://expense-tracker-depy.onrender.com";
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const token =

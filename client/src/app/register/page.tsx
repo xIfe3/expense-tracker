@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/toast';
-import { Wallet, Eye, EyeOff, ArrowRight, UserPlus, Check } from 'lucide-react';
+import { Eye, EyeOff, Wallet } from 'lucide-react';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -15,17 +15,12 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const checks = [
-    { label: 'At least 6 characters', ok: password.length >= 6 },
-    { label: 'Contains a number', ok: /\d/.test(password) },
-  ];
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       await register(name, email, password);
-      toast('Account created! Welcome to SpendWise.', 'success');
+      toast('Account created', 'success');
     } catch (err: unknown) {
       toast(err instanceof Error ? err.message : 'Registration failed', 'error');
     } finally {
@@ -34,153 +29,86 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left — Dark panel */}
-      <div className="relative hidden w-[480px] shrink-0 overflow-hidden bg-slate-950 lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute top-20 right-0 h-80 w-80 rounded-full bg-emerald-600/5 blur-[120px]" />
-        <div className="absolute bottom-20 left-0 h-64 w-64 rounded-full bg-blue-600/5 blur-[100px]" />
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-sm">
+        <Link href="/" className="mb-8 flex items-center justify-center gap-2 text-slate-900">
+          <Wallet className="h-5 w-5 text-blue-600" />
+          <span className="font-bold">Savvio</span>
+        </Link>
 
-        <div className="relative p-10">
-          <div className="flex items-center gap-2 text-white">
-            <Wallet className="h-5 w-5 text-blue-400" />
-            <span className="font-bold">SpendWise</span>
-          </div>
-        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h1 className="text-xl font-semibold text-slate-900">Create account</h1>
+          <p className="mt-1 text-sm text-slate-500">Takes less than a minute.</p>
 
-        <div className="relative space-y-8 p-10">
-          <h2 className="text-3xl font-bold leading-tight text-white">
-            Start your<br />financial journey.
-          </h2>
-          <div className="space-y-4">
-            {[
-              { step: '01', text: 'Create your free account' },
-              { step: '02', text: 'Add your first expense' },
-              { step: '03', text: 'Set a monthly budget' },
-              { step: '04', text: 'Watch insights roll in' },
-            ].map((item) => (
-              <div key={item.step} className="flex items-center gap-4">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-slate-500">
-                  {item.step}
-                </span>
-                <span className="text-sm text-slate-400">{item.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative border-t border-white/5 p-10">
-          <p className="text-xs text-slate-600">
-            No credit card needed. No bank linking. Start in 30 seconds.
-          </p>
-        </div>
-      </div>
-
-      {/* Right — Form */}
-      <div className="flex flex-1 items-center justify-center bg-white px-6">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="mb-12 flex items-center gap-2 lg:hidden">
-            <Wallet className="h-5 w-5 text-blue-600" />
-            <span className="font-bold text-slate-900">SpendWise</span>
-          </div>
-
-          <div className="mb-8">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900">
-              <UserPlus className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">Create account</h1>
-            <p className="mt-1.5 text-sm text-slate-500">
-              Start tracking your expenses in under a minute
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Full name
+              <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">
+                Name
               </label>
               <input
+                id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="Your name"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
                 Email
               </label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">
                 Password
               </label>
               <div className="relative">
                 <input
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-11 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                  placeholder="Create a password"
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 pr-10 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="At least 6 characters"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {password && (
-                <div className="mt-2.5 flex gap-4">
-                  {checks.map((c) => (
-                    <div key={c.label} className="flex items-center gap-1.5 text-xs">
-                      <div className={`flex h-3.5 w-3.5 items-center justify-center rounded-full ${c.ok ? 'bg-emerald-500' : 'bg-slate-200'}`}>
-                        <Check className={`h-2 w-2 ${c.ok ? 'text-white' : 'text-slate-400'}`} />
-                      </div>
-                      <span className={c.ok ? 'text-emerald-600' : 'text-slate-400'}>{c.label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="group mt-2 flex w-full items-center justify-center gap-2.5 rounded-xl bg-slate-900 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+              className="w-full rounded-md bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
             >
-              {loading ? (
-                <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  Create account
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </>
-              )}
+              {loading ? 'Creating…' : 'Create account'}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 hover:decoration-slate-900">
+            <Link href="/login" className="font-medium text-blue-600 hover:underline">
               Sign in
             </Link>
           </p>

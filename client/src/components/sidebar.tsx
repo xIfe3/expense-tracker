@@ -49,7 +49,7 @@ export function MobileHeader() {
     <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
       <div className="flex items-center gap-2">
         <Wallet className="h-5 w-5 text-blue-600" />
-        <span className="text-base font-bold text-slate-900">SpendWise</span>
+        <span className="text-base font-bold text-slate-900">Savvio</span>
       </div>
       <div className="flex items-center gap-3">
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
@@ -79,7 +79,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-6">
         <Wallet className="h-5 w-5 text-blue-400" />
-        <span className="text-base font-bold">SpendWise</span>
+        <span className="text-base font-bold">Savvio</span>
       </div>
 
       {/* Nav */}

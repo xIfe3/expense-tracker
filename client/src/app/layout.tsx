@@ -4,8 +4,8 @@ import { ToastProvider } from '@/components/toast';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SpendWise — Smart Expense Tracker',
-  description: 'Track your expenses, manage budgets, and gain financial insights',
+  title: 'Savvio — Expense Tracker',
+  description: 'A simple personal expense tracker. Final year project.',
 };
 
 export default function RootLayout({

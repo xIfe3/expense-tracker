@@ -10,7 +10,6 @@ import {
   TrendingDown,
   ShieldCheck,
   BarChart3,
-  Sparkles,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -30,7 +29,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Wallet className="h-5 w-5 text-blue-400" />
-            <span className="text-lg font-bold">SpendWise</span>
+            <span className="text-lg font-bold">Savvio</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login" className="px-4 py-2 text-sm text-slate-400 hover:text-white">
@@ -40,7 +39,7 @@ export default function LandingPage() {
               href="/register"
               className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100"
             >
-              Sign up free
+              Create account
             </Link>
           </div>
         </div>
@@ -48,37 +47,30 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-20">
-        <div className="absolute top-32 left-1/4 h-72 w-72 rounded-full bg-blue-600/8 blur-[100px]" />
-        <div className="absolute bottom-32 right-1/4 h-60 w-60 rounded-full bg-purple-600/8 blur-[100px]" />
-
         <div className="animate-fade-up relative text-center" style={{ animationDelay: '0.1s' }}>
-          <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-slate-400">
-            <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-            Simple expense tracking that works
-          </div>
-
-          <h1 className="mx-auto max-w-3xl text-5xl font-extrabold leading-[1.1] tracking-tight sm:text-7xl">
-            Know where your money goes
+          <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-6xl">
+            A simple way to see where<br />your money goes.
           </h1>
 
-          <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-slate-400">
-            Track spending. Set budgets. See patterns. All without connecting
-            your bank account or sharing sensitive data.
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+            Savvio is a personal expense tracker I built as my final year project.
+            You type in what you spend, pick a category, and the dashboard shows
+            you the rest. No bank linking, no data sharing.
           </p>
 
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/register"
-              className="group flex items-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white hover:bg-blue-500"
+              className="group flex items-center gap-2 rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white hover:bg-blue-500"
             >
-              Start tracking — it&apos;s free
+              Create an account
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               href="/login"
-              className="flex items-center gap-2 rounded-full border border-white/10 px-8 py-3.5 text-sm font-semibold text-white hover:border-white/20 hover:bg-white/5"
+              className="flex items-center gap-2 rounded-full border border-white/10 px-7 py-3 text-sm font-semibold text-white hover:border-white/20 hover:bg-white/5"
             >
-              I have an account
+              I already have one
             </Link>
           </div>
         </div>
@@ -94,7 +86,7 @@ export default function LandingPage() {
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-slate-500">Total spent this month</p>
-                  <p className="mt-1 text-3xl font-bold">&#8358;248,500</p>
+                  <p className="mt-1 text-3xl font-bold">€485.30</p>
                 </div>
                 <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
                   12% less than last month
@@ -120,9 +112,9 @@ export default function LandingPage() {
               {/* Mock recent items */}
               <div className="mt-6 space-y-2">
                 {[
-                  { name: 'Grocery shopping', cat: 'Food', amt: '₦12,400', color: 'bg-amber-500' },
-                  { name: 'Uber ride', cat: 'Transport', amt: '₦3,200', color: 'bg-blue-500' },
-                  { name: 'Netflix sub', cat: 'Entertainment', amt: '₦6,500', color: 'bg-purple-500' },
+                  { name: 'Grocery shopping', cat: 'Food', amt: '€42.80', color: 'bg-amber-500' },
+                  { name: 'Bus pass', cat: 'Transport', amt: '€28.00', color: 'bg-blue-500' },
+                  { name: 'Netflix', cat: 'Entertainment', amt: '€12.99', color: 'bg-purple-500' },
                 ].map((item) => (
                   <div key={item.name} className="flex items-center justify-between rounded-lg bg-white/5 px-4 py-2.5">
                     <div className="flex items-center gap-3">
@@ -142,36 +134,35 @@ export default function LandingPage() {
       </section>
 
       {/* Why section */}
-      <section className="border-t border-white/5 py-28">
+      <section className="border-t border-white/5 py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold">Built different, on purpose</h2>
+            <h2 className="text-3xl font-bold">What it does</h2>
             <p className="mt-3 text-slate-400">
-              No gimmicks. No bank linking. Just honest tools that help you
-              understand and control your spending.
+              A small set of features I thought were actually useful. Nothing more.
             </p>
           </div>
 
-          <div className="mt-16 space-y-4">
+          <div className="mt-14 space-y-4">
             {[
               {
                 icon: TrendingDown,
-                title: 'See spending trends clearly',
-                desc: 'Daily, monthly, and category breakdowns with charts that actually make sense. Spot patterns before they become problems.',
+                title: 'Charts that answer real questions',
+                desc: 'How much did I spend this month? How does it compare to last? Where did the money go? A few charts, each there for a reason.',
                 accent: 'text-blue-400',
                 bg: 'bg-blue-500/10',
               },
               {
                 icon: ShieldCheck,
-                title: 'Your data stays private',
-                desc: 'Manual entry by design. No bank connections, no third-party data sharing. Your finances are nobody else\'s business.',
+                title: 'Manual entry, no bank linking',
+                desc: 'You type in your expenses yourself. The app never asks for bank credentials and never sends your data anywhere else.',
                 accent: 'text-emerald-400',
                 bg: 'bg-emerald-500/10',
               },
               {
                 icon: BarChart3,
-                title: 'Budgets that hold you accountable',
-                desc: 'Set limits per category each month. Visual progress bars show exactly where you stand — no surprises at month end.',
+                title: 'Monthly budgets per category',
+                desc: 'Set a limit for each category at the start of the month. A progress bar shows how close you are to the limit as you spend.',
                 accent: 'text-purple-400',
                 bg: 'bg-purple-500/10',
               },
@@ -195,17 +186,17 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/5 py-28">
+      <section className="border-t border-white/5 py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="text-4xl font-bold">Start today. It takes 30 seconds.</h2>
-          <p className="mt-4 text-lg text-slate-400">
-            Create a free account and add your first expense right away.
+          <h2 className="text-3xl font-bold">Try it out</h2>
+          <p className="mt-3 text-slate-400">
+            Make an account and add your first expense. That is it.
           </p>
           <Link
             href="/register"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-slate-900 hover:bg-slate-100"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
           >
-            Create free account
+            Create an account
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -213,12 +204,12 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-6">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 text-sm text-slate-600">
+        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-6 text-sm text-slate-600 sm:flex-row">
           <div className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
-            <span>SpendWise</span>
+            <span>Savvio</span>
           </div>
-          <span>Privacy-first expense tracking</span>
+          <span>Final year project — 2026</span>
         </div>
       </footer>
     </div>

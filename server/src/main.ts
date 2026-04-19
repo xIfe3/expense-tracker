@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://expense-tracker-ten-teal.vercel.app/',
+    origin: 'https://expense-tracker-ten-teal.vercel.app',
     credentials: true,
   });
 

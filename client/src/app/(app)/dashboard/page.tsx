@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { analytics as analyticsApi } from '@/lib/api';
+import { analytics as analyticsApi, income as incomeApi } from '@/lib/api';
 import { formatCurrency, getCurrentMonth, getMonthLabel, formatDate } from '@/lib/utils';
 import { CardSkeleton, ChartSkeleton } from '@/components/loading';
 import {
@@ -10,6 +10,9 @@ import {
   Receipt,
   ArrowUpRight,
   ArrowDownRight,
+  Pencil,
+  Check,
+  X,
 } from 'lucide-react';
 import {
   BarChart,
@@ -30,6 +33,8 @@ interface Summary {
   previousMonthTotal: number;
   changePercent: number;
   expenseCount: number;
+  monthlyIncome: number | null;
+  remaining: number | null;
   recentExpenses: Array<{
     id: number;
     amount: number;
@@ -56,6 +61,19 @@ interface DailyData {
   amount: number;
 }
 
+const tooltipStyle = {
+  contentStyle: {
+    background: '#0f172a',
+    border: 'none',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '12px',
+    padding: '8px 12px',
+  },
+  labelStyle: { color: '#94a3b8' },
+  itemStyle: { color: '#fff' },
+};
+
 export default function DashboardPage() {
   const [month] = useState(getCurrentMonth());
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -63,6 +81,10 @@ export default function DashboardPage() {
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [dailyData, setDailyData] = useState<DailyData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingIncome, setEditingIncome] = useState(false);
+  const [incomeInput, setIncomeInput] = useState('');
+  const [savingIncome, setSavingIncome] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -80,6 +102,23 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [month]);
 
+  const handleSaveIncome = async () => {
+    const amount = parseFloat(incomeInput);
+    if (isNaN(amount) || amount < 0) return;
+    setSavingIncome(true);
+    try {
+      await incomeApi.set({ month, amount });
+      setSummary((prev) =>
+        prev
+          ? { ...prev, monthlyIncome: amount, remaining: amount - prev.totalSpent }
+          : prev,
+      );
+      setEditingIncome(false);
+    } finally {
+      setSavingIncome(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -87,6 +126,7 @@ export default function DashboardPage() {
           <div className="h-8 w-48 animate-pulse rounded-lg bg-slate-200" />
           <div className="mt-2 h-4 w-32 animate-pulse rounded bg-slate-100" />
         </div>
+        <div className="h-20 animate-pulse rounded-2xl bg-slate-100" />
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <div className="flex-1"><CardSkeleton /></div>
           <div className="flex-1"><CardSkeleton /></div>
@@ -102,6 +142,11 @@ export default function DashboardPage() {
   }
 
   const isUp = (summary?.changePercent || 0) > 0;
+  const hasIncome = summary?.monthlyIncome != null;
+  const spentPercent = hasIncome
+    ? Math.min(100, Math.round(((summary!.totalSpent) / summary!.monthlyIncome!) * 100))
+    : 0;
+  const isOverBudget = hasIncome && summary!.totalSpent > summary!.monthlyIncome!;
 
   return (
     <div className="space-y-6">
@@ -109,6 +154,106 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">{getMonthLabel(month)} overview</p>
+      </div>
+
+      {/* Salary / remaining banner */}
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 sm:p-5">
+        {hasIncome && !editingIncome ? (
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-xs text-slate-400">Monthly salary</p>
+                  <p className="mt-0.5 text-lg font-bold text-slate-900">
+                    {formatCurrency(summary!.monthlyIncome!)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">Spent</p>
+                  <p className="mt-0.5 text-lg font-bold text-slate-900">
+                    {formatCurrency(summary!.totalSpent)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">Remaining</p>
+                  <p className={`mt-0.5 text-lg font-bold ${isOverBudget ? 'text-red-500' : 'text-emerald-600'}`}>
+                    {formatCurrency(Math.abs(summary!.remaining!))}
+                    {isOverBudget && <span className="ml-1 text-xs font-medium">over</span>}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIncomeInput(String(summary!.monthlyIncome));
+                  setEditingIncome(true);
+                }}
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={`h-2 rounded-full transition-all ${isOverBudget ? 'bg-red-500' : spentPercent > 80 ? 'bg-amber-400' : 'bg-emerald-500'}`}
+                  style={{ width: `${spentPercent}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-slate-400">{spentPercent}% of salary spent</p>
+            </div>
+          </div>
+        ) : editingIncome ? (
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <label className="mb-1 block text-xs text-slate-500">
+                Monthly salary for {getMonthLabel(month)}
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={incomeInput}
+                onChange={(e) => setIncomeInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveIncome()}
+                autoFocus
+                className="w-full max-w-[200px] rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g. 1800"
+              />
+            </div>
+            <div className="flex gap-2 pt-5">
+              <button
+                onClick={handleSaveIncome}
+                disabled={savingIncome}
+                className="flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+              >
+                <Check className="h-3.5 w-3.5" />
+                Save
+              </button>
+              <button
+                onClick={() => setEditingIncome(false)}
+                className="rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-700">No salary set for this month</p>
+              <p className="text-xs text-slate-400">Add your monthly income to track how much you have left.</p>
+            </div>
+            <button
+              onClick={() => {
+                setIncomeInput('');
+                setEditingIncome(true);
+              }}
+              className="rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Set salary
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Top stats — asymmetric */}
@@ -181,40 +326,10 @@ export default function DashboardPage() {
                   <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis
-                dataKey="day"
-                fontSize={11}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: '#94a3b8' }}
-              />
-              <YAxis
-                fontSize={11}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: '#94a3b8' }}
-                width={45}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: '#0f172a',
-                  border: 'none',
-                  borderRadius: '12px',
-                  color: '#fff',
-                  fontSize: '12px',
-                  padding: '8px 12px',
-                }}
-                labelStyle={{ color: '#94a3b8' }}
-                itemStyle={{ color: '#fff' }}
-                formatter={(value: number) => [formatCurrency(value), 'Spent']}
-              />
-              <Area
-                type="monotone"
-                dataKey="amount"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                fill="url(#areaFill)"
-              />
+              <XAxis dataKey="day" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} />
+              <YAxis fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} width={45} />
+              <Tooltip {...tooltipStyle} formatter={(value: number) => [formatCurrency(value), 'Spent']} />
+              <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} fill="url(#areaFill)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -227,33 +342,12 @@ export default function DashboardPage() {
             <>
               <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie
-                    data={categoryData}
-                    dataKey="amount"
-                    nameKey="categoryName"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={70}
-                    innerRadius={45}
-                    strokeWidth={0}
-                  >
+                  <Pie data={categoryData} dataKey="amount" nameKey="categoryName" cx="50%" cy="50%" outerRadius={70} innerRadius={45} strokeWidth={0}>
                     {categoryData.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: '#0f172a',
-                      border: 'none',
-                      borderRadius: '12px',
-                      color: '#fff',
-                      fontSize: '12px',
-                      padding: '8px 12px',
-                    }}
-                    labelStyle={{ color: '#94a3b8' }}
-                    itemStyle={{ color: '#fff' }}
-                    formatter={(value: number) => formatCurrency(value)}
-                  />
+                  <Tooltip {...tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="mt-2 space-y-2">
@@ -284,33 +378,9 @@ export default function DashboardPage() {
           <p className="mb-6 text-xs text-slate-400">Last 6 months</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={trendData}>
-              <XAxis
-                dataKey="label"
-                fontSize={11}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: '#94a3b8' }}
-              />
-              <YAxis
-                fontSize={11}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: '#94a3b8' }}
-                width={45}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: '#0f172a',
-                  border: 'none',
-                  borderRadius: '12px',
-                  color: '#fff',
-                  fontSize: '12px',
-                  padding: '8px 12px',
-                }}
-                labelStyle={{ color: '#94a3b8' }}
-                itemStyle={{ color: '#fff' }}
-                formatter={(value: number) => [formatCurrency(value), 'Total']}
-              />
+              <XAxis dataKey="label" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} />
+              <YAxis fontSize={11} tickLine={false} axisLine={false} tick={{ fill: '#94a3b8' }} width={45} />
+              <Tooltip {...tooltipStyle} formatter={(value: number) => [formatCurrency(value), 'Total']} />
               <Bar dataKey="total" fill="#0f172a" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -323,20 +393,11 @@ export default function DashboardPage() {
           {summary?.recentExpenses && summary.recentExpenses.length > 0 ? (
             <div className="space-y-1">
               {summary.recentExpenses.map((expense) => (
-                <div
-                  key={expense.id}
-                  className="flex items-center justify-between rounded-xl px-3 py-3 transition-colors hover:bg-slate-50"
-                >
+                <div key={expense.id} className="flex items-center justify-between rounded-xl px-3 py-3 transition-colors hover:bg-slate-50">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="h-9 w-9 rounded-lg"
-                      style={{ backgroundColor: expense.category.color + '15' }}
-                    >
+                    <div className="h-9 w-9 rounded-lg" style={{ backgroundColor: expense.category.color + '15' }}>
                       <div className="flex h-full w-full items-center justify-center">
-                        <div
-                          className="h-2 w-2 rounded-full"
-                          style={{ backgroundColor: expense.category.color }}
-                        />
+                        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: expense.category.color }} />
                       </div>
                     </div>
                     <div>

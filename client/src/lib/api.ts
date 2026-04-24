@@ -1,4 +1,5 @@
 const API_URL = "https://expense-tracker-depy.onrender.com";
+// const API_URL = "http://localhost:3005";
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const token =
@@ -87,6 +88,13 @@ export const budgets = {
   update: (id: number, data: { amount?: number }) =>
     fetchApi(`/budgets/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   delete: (id: number) => fetchApi(`/budgets/${id}`, { method: "DELETE" }),
+};
+
+// Income
+export const income = {
+  get: (month: string) => fetchApi(`/income?month=${month}`),
+  set: (data: { month: string; amount: number }) =>
+    fetchApi("/income", { method: "POST", body: JSON.stringify(data) }),
 };
 
 // Analytics

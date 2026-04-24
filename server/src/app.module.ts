@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { IncomeModule } from './income/income.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     ExpensesModule,
     BudgetsModule,
     AnalyticsModule,
+    IncomeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

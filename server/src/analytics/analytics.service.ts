@@ -14,7 +14,7 @@ export class AnalyticsService {
     const prevStart = new Date(startDate);
     prevStart.setMonth(prevStart.getMonth() - 1);
 
-    const [currentTotal, previousTotal, expenseCount, recentExpenses] =
+    const [currentTotal, previousTotal, expenseCount, recentExpenses, income] =
       await Promise.all([
         this.prisma.expense.aggregate({
           where: {
@@ -42,12 +42,16 @@ export class AnalyticsService {
           orderBy: { date: 'desc' },
           take: 5,
         }),
+        this.prisma.monthlyIncome.findUnique({
+          where: { month_userId: { month, userId } },
+        }),
       ]);
 
     const current = currentTotal._sum.amount || 0;
     const previous = previousTotal._sum.amount || 0;
     const changePercent =
       previous > 0 ? ((current - previous) / previous) * 100 : 0;
+    const monthlyIncome = income?.amount ?? null;
 
     return {
       totalSpent: current,
@@ -55,6 +59,8 @@ export class AnalyticsService {
       changePercent: Math.round(changePercent * 10) / 10,
       expenseCount,
       recentExpenses,
+      monthlyIncome,
+      remaining: monthlyIncome !== null ? monthlyIncome - current : null,
     };
   }
 

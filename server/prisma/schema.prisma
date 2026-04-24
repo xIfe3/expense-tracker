@@ -8,14 +8,26 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  password  String
-  name      String
-  createdAt DateTime   @default(now())
-  expenses  Expense[]
+  id         Int             @id @default(autoincrement())
+  email      String          @unique
+  password   String
+  name       String
+  createdAt  DateTime        @default(now())
+  expenses   Expense[]
   categories Category[]
-  budgets   Budget[]
+  budgets    Budget[]
+  incomes    MonthlyIncome[]
+}
+
+model MonthlyIncome {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  month     String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([month, userId])
 }
 
 model Category {
